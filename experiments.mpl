@@ -20,36 +20,25 @@ infolevel[DifferentialThomas]:=2;
 # ];
 
 sigma := [
-  diff(S(t), t) = b * S(t) * In(t) / N,
-  diff(E(t), t) = b * S(t) * In(t) / N - nu * E(t),
-  diff(In(t), t) = nu * E(t) - a * In(t),
-  y1(t) = In(t),
-  y2(t) = N
+  diff(xA(t), t) = -k1 * xA(t),
+  diff(xB(t), t) = k1 * xA(t) - k2 * xB(t),
+  diff(xC(t), t) = k2 * xB(t),
+  diff(eA(t), t) = 0,
+  diff(eC(t), t) = 0,
+  y1(t) = xC(t),
+  y2(t) = eA(t) * xA(t) + eB * xB(t) + eC(t) * xC(t),
+  y3(t) = eA(t),
+  y4(t) = eC(t)
 ]:
 
-ComputeRanking([t], [[S,E,In], [y1, y2]]);
+ComputeRanking([t], [[eA, eC, xA, xB, xC], [y1, y2, y3, y4]]);
 tdds_out := DifferentialThomasDecomposition(map(x->lhs(x) - rhs(x), sigma), [], "stop"=1): # TDDS not using equations
 
-Ranking([t], [[S,E,In], [y1, y2]]);
+Ranking([t], [[eA, eC, xA, xB, xC], [y1, y2, y3, y4]]);
 dt_out := ThomasDecomposition(sigma, [], "stop"=1); # Equations():
 
 # Rosenfeld Groebner Code
 
-Rorig := DifferentialRing(blocks = [[y1, y2], [S,E,In]], derivations = [t], arbitrary = []):
-chset_orig := RosenfeldGroebner(model, Rorig)[1]
+Rorig := DifferentialAlgebra:-DifferentialRing(blocks = [ [y1, y2, y3, y4], [eA, eC, xA, xB, xC]], derivations = [t], arbitrary = [eb, k1, k2]):
+chset_orig := DifferentialAlgebra:-RosenfeldGroebner(map(x->lhs(x)-rhs(x), sigma), Rorig, singsol=none)[1];
 
-(*
-[
-diff(y2(t),t)*eB+k2*(xa(t)*y3(t)+y2(t)*y4(t)-y1(t)),
-
-k2*xb(t)-diff(y2(t),t), 
-
--y2(t)+xc(t),
-((-k2*y4(t)-eB*(k1-k2))*y3(t)+eB^2*k1)*diff(y2(t),t)-(-y3(t)*diff(y1(t),t)+k1*(-y2(t)*y4(t)+y1(t))*(eB-y3(t)))*k2,
-
-diff(y2(t),t $ 2)*y3(t)+(eB*k1+k2*y3(t))*diff(y2(t),t)-k1*k2*(-y2(t)*y4(t)+y1(t))
-]
-
-
-[k1*k2*y1(t)-diff(y2(t),t $ 2)*y3(t)-k2*diff(y2(t),t)*y3(t)-eB*k1*diff(y2(t),t)-k1*k2*y2(t)*y4(t), 
-diff(y2(t),t $ 3)+diff(y2(t),t $ 2)*k1+diff(y2(t),t $ 2)*k2+diff(y2(t),t)*k1*k2]*)

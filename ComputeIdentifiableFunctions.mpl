@@ -204,7 +204,7 @@ GetIOEquations := proc(model, states, inputs, outputs, params, infolevel)
     #                              and parameters, respectively
     # Computes a list of input-output equations of the model
     local Relim, Rorig, charsets, chset_orig, general_comps, general, c, e, gen_comp, io_eqs:
- 
+    is_deriv := x-> StringTools[Has](convert(x, string), "diff");
     if infolevel > 0 then
         printf("    Computing the characteristic set (singsol = none)\n"):
     end if:
@@ -220,8 +220,9 @@ GetIOEquations := proc(model, states, inputs, outputs, params, infolevel)
     charsets := DifferentialThomas:-ThomasDecomposition(model, [], "stop"=1); 
 
     gen_comp := charsets[1]:
-    io_eqs := DifferentialThomas:-Equations(gen_comp, DifferentialThomas:-Tools:-Leader < parse(cat(states[-1], "(t)"))):
-    return map(x->simplify(denom(rhs(x))*lhs(x)-denom(rhs(x))*rhs(x)), io_eqs):
+    io_eqs := DifferentialThomas:-Equations(gen_comp): #, DifferentialThomas:-Tools:-Leader < parse(cat(states[-1], "(t)"))):
+    io_eqs := select(x->is_deriv(lhs(x)), io_eqs):
+    return map(x->expand(simplify(denom(rhs(x))*lhs(x)-denom(rhs(x))*rhs(x))), io_eqs):
 end proc:
 
 #------------------------------------------------------------------------------
