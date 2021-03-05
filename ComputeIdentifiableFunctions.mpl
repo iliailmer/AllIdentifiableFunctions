@@ -204,10 +204,6 @@ GetIOEquations := proc(model, states, inputs, outputs, params, infolevel)
     #                              and parameters, respectively
     # Computes a list of input-output equations of the model
     local Relim, Rorig, charsets, chset_orig, general_comps, general, c, e, gen_comp, io_eqs:
-
-    # Relim := DifferentialRing(blocks = [[op(states)], op(outputs), [op(inputs)]], derivations = [t], arbitrary = params):
-    # Rorig := DifferentialRing(blocks = [[op(outputs)], [op(states)], [op(inputs)]], derivations = [t], arbitrary = params):
-    # chset_orig := RosenfeldGroebner(model, Rorig)[1]:
  
     if infolevel > 0 then
         printf("    Computing the characteristic set (singsol = none)\n"):
@@ -223,37 +219,9 @@ GetIOEquations := proc(model, states, inputs, outputs, params, infolevel)
     DifferentialThomas:-Ranking([t], state_outs_inputs);
     charsets := DifferentialThomas:-ThomasDecomposition(model, [], "stop"=1); 
 
-    # if CheckReducibilitySet(Equations(charsets[1]), chset_orig) then
     gen_comp := charsets[1]:
-    # else
-    #     if infolevel > 0 then
-    #         printf("    Did not pick the right component. Using singsol = all\n"):
-    #     end if:
-    #     charsets := RosenfeldGroebner(model, Relim):
-    
-    #     if infolevel > 0 then
-    #         printf("    Selecting the general component\n"):
-    #     end if:
-    #     general_comps := []:
-    #     for c in charsets do
-    #         general := true:
-    #         for e in Equations(c) do
-    #             if NormalForm(e, chset_orig) <> 0 then
-    #                 general := false:
-    #                 break:
-    #             end if:
-    #         end do:
-    #         if general then
-    #             general_comps := [op(general_comps), c]:
-    #         end if:
-    #     end do:
-    #     if nops(general_comps) > 1 then
-    #         print("More than one component is considered general!", general_comps):
-    #     end if:
-    #     gen_comp := general_comps[1]:
-    # end if:
-    io_eqs := DifferentialThomas:-Equations(gen_comp, leader < parse(cat(states[-1], "(t)"))):
-    return io_eqs:
+    io_eqs := DifferentialThomas:-Equations(gen_comp, DifferentialThomas:-Tools:-Leader < parse(cat(states[-1], "(t)"))):
+    return map(x->simplify(denom(rhs(x))*lhs(x)-denom(rhs(x))*rhs(x)), io_eqs):
 end proc:
 
 #------------------------------------------------------------------------------

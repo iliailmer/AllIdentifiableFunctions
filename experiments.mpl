@@ -37,3 +37,19 @@ dt_out := ThomasDecomposition(sigma, [], "stop"=1); # Equations():
 
 Rorig := DifferentialRing(blocks = [[y1, y2], [S,E,In]], derivations = [t], arbitrary = []):
 chset_orig := RosenfeldGroebner(model, Rorig)[1]
+
+(*
+[
+diff(y2(t),t)*eB+k2*(xa(t)*y3(t)+y2(t)*y4(t)-y1(t)),
+
+k2*xb(t)-diff(y2(t),t), 
+
+-y2(t)+xc(t),
+((-k2*y4(t)-eB*(k1-k2))*y3(t)+eB^2*k1)*diff(y2(t),t)-(-y3(t)*diff(y1(t),t)+k1*(-y2(t)*y4(t)+y1(t))*(eB-y3(t)))*k2,
+
+diff(y2(t),t $ 2)*y3(t)+(eB*k1+k2*y3(t))*diff(y2(t),t)-k1*k2*(-y2(t)*y4(t)+y1(t))
+]
+
+
+[k1*k2*y1(t)-diff(y2(t),t $ 2)*y3(t)-k2*diff(y2(t),t)*y3(t)-eB*k1*diff(y2(t),t)-k1*k2*y2(t)*y4(t), 
+diff(y2(t),t $ 3)+diff(y2(t),t $ 2)*k1+diff(y2(t),t $ 2)*k2+diff(y2(t),t)*k1*k2]*)
