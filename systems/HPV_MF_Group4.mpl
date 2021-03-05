@@ -13,8 +13,9 @@ eq[3] := (i,j) -> diff(IG[i](t),t) = S[i](t) * (betaOG[j,i] * (IO[j](t) + IOG[j]
 eq[4] := (i,j) -> diff(IOG[i](t),t) = IO[i](t)*(nuOG[i] + betaOG[j,i]* (IO[j](t) + IOG[j](t)) + betaGG[j,i]*(IG[j](t) + IOG[j](t)))
                                   + IG[i](t)*(nuGO[i] + betaOO[j,i]* (IO[j](t) + IOG[j](t)) + betaGO[j,i]*(IG[j](t) + IOG[j](t)))
                                   - IOG[i](t)*(gammaO[i] + gammaG[i] + mu):
-
-sigma := [seq(eq[i](M,F),i=1..4), 
+kernelopts(printbytes=false, assertlevel=1):
+interface(echo=0, prettyprint=0):
+model :=[seq(eq[i](M,F),i=1..4), 
           seq(eq[i](F,M),i=1..4),
           y1(t)=IG[M](t) + IOG[M](t), 
           y2(t)=IO[M](t) + IOG[M](t),

@@ -2,9 +2,10 @@
 # Vajda S., Rabitz H.
 # Identifiability and Distinguishability of First-Order Reaction Systems, p. 701
 # We added an extra output x_C
-read "../IdentifiabilityODE.mpl":
-
-sigma := [
+read "../ComputeIdentifiableFunctionsRG.mpl"; #"../IdentifiabilityODE.mpl":
+kernelopts(printbytes=false, assertlevel=1):
+interface(echo=0, prettyprint=0):
+model :=[
   diff(xA(t), t) = -k1 * xA(t),
   diff(xB(t), t) = k1 * xA(t) - k2 * xB(t),
   diff(xC(t), t) = k2 * xB(t),
@@ -14,12 +15,12 @@ sigma := [
   y2(t) = eA(t) * xA(t) + eB * xB(t) + eC(t) * xC(t),
   y3(t) = eA(t),
   y4(t) = eC(t)
-];
+]:
 
-IdentifiabilityODE(sigma, GetParameters(sigma));
+me:= MultiExperimentIdentifiableFunctions(model, simplified_generators=true, no_bound=true): print(me[3]);#IdentifiabilityODE(sigma, GetParameters(sigma));
 
 # The following computation shows that one can identify more from two experiments
 # GenerateReplica(sigma, 2) generates a system consiting of two copies of sigma
 # with the same parameters in ODEs but different inputs and initial conditions
 
-IdentifiabilityODE(GenerateReplica(sigma, 2), GetParameters(sigma, initial_conditions=false));
+# IdentifiabilityODE(GenerateReplica(sigma, 2), GetParameters(sigma, initial_conditions=false));

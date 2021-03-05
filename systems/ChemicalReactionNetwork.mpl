@@ -3,9 +3,10 @@
 # Conradi, C., Shiu, A.,
 # Dynamics of post-translational modification systems: recent progress and future directions
 # Eq. 3.4
-read "../IdentifiabilityODE.mpl";
-
-sigma := [
+read "../ComputeIdentifiableFunctionsRG.mpl"; #"../IdentifiabilityODE.mpl";
+kernelopts(printbytes=false, assertlevel=1):
+interface(echo=0, prettyprint=0):
+model :=[
   diff(x1(t), t) = -k1 * x1(t) * x2(t) + k2 * x4(t) + k4 * x6(t),
   diff(x2(t), t) = k1 * x1(t) * x2(t) + k2 * x4(t) + k3 * x4(t),
   diff(x3(t), t) = k3 * x4(t) + k5 * x6(t) - k6 * x3(t) * x5(t),
@@ -14,6 +15,7 @@ sigma := [
   diff(x6(t), t) = -k4 * x6(t) - k5 * x6(t) + k6 * x3(t) * x5(t),
   y1(t) = x3(t),
   y2(t) = x2(t)
-];
+]:
 
-IdentifiabilityODE(sigma, GetParameters(sigma)):
+me:= MultiExperimentIdentifiableFunctions(model, simplified_generators=true, no_bound=true):
+print(me[3]);#IdentifiabilityODE(sigma, GetParameters(sigma)):

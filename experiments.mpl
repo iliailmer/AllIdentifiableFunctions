@@ -9,7 +9,7 @@ infolevel[TDDS] := 2;
 infolevel[DifferentialThomas]:=2;
 
 
-# sigma := [
+# model :=[
 #   diff(x(t), t) = lm - d * x(t) - beta * x(t) * v(t),
 #   diff(y(t), t) = beta * x(t) * v(t) - a * y(t),
 #   diff(v(t), t) = k * y(t) - u * v(t),
@@ -17,9 +17,10 @@ infolevel[DifferentialThomas]:=2;
 #   diff(z(t), t) = c * q * y(t) * w(t) - h * z(t),
 #   y1(t) = w(t),
 #   y2(t) = z(t)
-# ];
-
-sigma := [
+# ]:
+kernelopts(printbytes=false, assertlevel=1):
+interface(echo=0, prettyprint=0):
+model :=[
   diff(xA(t), t) = -k1 * xA(t),
   diff(xB(t), t) = k1 * xA(t) - k2 * xB(t),
   diff(xC(t), t) = k2 * xB(t),
@@ -40,5 +41,5 @@ dt_out := ThomasDecomposition(sigma, [], "stop"=1); # Equations():
 # Rosenfeld Groebner Code
 
 Rorig := DifferentialAlgebra:-DifferentialRing(blocks = [ [y1, y2, y3, y4], [eA, eC, xA, xB, xC]], derivations = [t], arbitrary = [eb, k1, k2]):
-chset_orig := DifferentialAlgebra:-RosenfeldGroebner(map(x->lhs(x)-rhs(x), sigma), Rorig, singsol=none)[1];
+chset_orig := DifferentialAlgebra:-RosenfeldGroebner(map(x->lhs(x)-rhs(x), sigma), Rorig, singsol=none)[1]:
 

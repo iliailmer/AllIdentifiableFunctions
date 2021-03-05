@@ -3,9 +3,10 @@
 # "Parameter Estimation of Some Epidemic Models. The Case of Recurrent Epidemics Caused by Respiratory Syncytial Virus"
 # doi.org/10.1007/s11538-009-9429-3
 # Equations (7)-(11)
-read "../IdentifiabilityODE.mpl":
-
-sigma := [
+read "../ComputeIdentifiableFunctions.mpl"; #"../IdentifiabilityODE.mpl":
+kernelopts(printbytes=false, assertlevel=1):
+interface(echo=0, prettyprint=0):
+model :=[
   diff(s(t), t) = mu - mu * s(t) - b0 * (1 + b1 * x1(t)) * i(t) * s(t) + g * r(t),
   diff(i(t), t) = b0 * (1 + b1 * x1(t)) * i(t) * s(t) - (nu + mu) * i(t),
   diff(r(t), t) = nu * i(t) - (mu + g) * r(t),
@@ -13,6 +14,6 @@ sigma := [
   diff(x2(t), t) = M * x1(t),
   y1(t) = i(t),
   y2(t) = r(t)
-];
+]:
 
-IdentifiabilityODE(sigma, GetParameters(sigma)):
+me:= MultiExperimentIdentifiableFunctions(model, simplified_generators=true, no_bound=true): print(me[3]);#IdentifiabilityODE(sigma, GetParameters(sigma)):

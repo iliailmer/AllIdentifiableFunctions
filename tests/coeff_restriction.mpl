@@ -24,7 +24,7 @@ cases := [
         ],
         PolynomialIdeal([-a - b + a_aux + b_aux, -a * a_aux + a * b + a_aux^2 - a_aux * b], variables={a_aux, b_aux})
     ]
-];
+]:
 
 num_passed := 0:
 num_failed := 0:

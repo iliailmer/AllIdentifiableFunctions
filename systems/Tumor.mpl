@@ -1,9 +1,10 @@
 # Example (with initial conditions assumed being unknown) from Section 3 of "Examples of testing global identifiability of biological and biomedical models with the DAISY software"
 # by M.P. Saccomani, S. Audoly, G. Bellu, L. D'Angio
 
-read "../IdentifiabilityODE.mpl";
-
-sigma := [
+read "../ComputeIdentifiableFunctionsRG.mpl"; #"../IdentifiabilityODE.mpl";
+kernelopts(printbytes=false, assertlevel=1):
+interface(echo=0, prettyprint=0):
+model :=[
   diff(x1(t), t) = -(k3 + k7) * x1(t) + k4 * x2(t),
   diff(x2(t), t) = k3 * x1(t) - (k4 + a(t) * k5 + b(t) * d(t) * k5) * x2(t) + k6 * x3(t) + k6 * x4(t) + k5 * x2(t) * x3(t) + k5 * x2(t) * x4(t),
   diff(x3(t), t) = a(t) * k5 * x2(t) - k6 * x3(t) - k5 * x2(t) * x3(t),
@@ -16,6 +17,6 @@ sigma := [
   y2(t) = a(t),
   y3(t) = b(t),
   y4(t) = d(t)
-];
+]:
 
-IdentifiabilityODE(sigma, GetParameters(sigma));
+me:= MultiExperimentIdentifiableFunctions(model, simplified_generators=true, no_bound=true): print(me[3]);#IdentifiabilityODE(sigma, GetParameters(sigma));

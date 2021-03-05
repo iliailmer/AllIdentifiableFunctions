@@ -7,7 +7,7 @@ cases := [
     [
         [(a + b) * (x + y) - (b + c) * (y + z) + 3 * (a + c) * (x + z), [x, y, z], [a, b, c]], 3
     ]
-];
+]:
 
 num_passed := 0:
 num_failed := 0:

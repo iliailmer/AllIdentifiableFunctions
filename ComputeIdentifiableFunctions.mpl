@@ -302,9 +302,17 @@ ConstructWronskian := proc(io_eq, model, states, inputs, outputs, params, state_
     end if:
     decomp := DecomposePolynomial(p, map(e -> rhs(e), diff_to_ord), params, infolevel):
     diff_polys := map(p -> subs(map(e -> rhs(e) = lhs(e), diff_to_ord), p), decomp[2]):
-    Rorig := DifferentialRing(blocks = [[op(outputs)], [op(states)], [op(inputs)]], derivations = [t], arbitrary = params):
-    chset_orig := RosenfeldGroebner(model, Rorig)[1]:
-    
+    # Rorig := DifferentialRing(blocks = [[op(outputs)], [op(states)], [op(inputs)]], derivations = [t], arbitrary = params):
+    # chset_orig := RosenfeldGroebner(model, Rorig)[1]:
+    if nops(inputs)>0 then
+        state_outs_inputs := [[op(states)], [op(outputs)], [op(inputs)]]:
+    else
+        state_outs_inputs := [[op(states)], [op(outputs)]]:
+    end if:
+
+    DifferentialThomas:-Ranking([t], state_outs_inputs);
+    chset_orig := DifferentialThomas:-ThomasDecomposition(model, []); 
+
     if infolevel > 0 then
         printf("    Computing the Wronskian\n"):
     end if:
@@ -328,8 +336,8 @@ ConstructWronskian := proc(io_eq, model, states, inputs, outputs, params, state_
             end do:
         end do:
     else
-        Rorig := DifferentialRing(blocks = [[op(outputs)], [op(states)], [op(inputs)]], derivations = [t], arbitrary = params):
-        chset_orig := RosenfeldGroebner(model, Rorig)[1]:
+        # Rorig := DifferentialRing(blocks = [[op(outputs)], [op(states)], [op(inputs)]], derivations = [t], arbitrary = params):
+        # chset_orig := RosenfeldGroebner(model, Rorig)[1]:
         yus_reduced := map(p -> p = NormalForm(p, chset_orig), yus):
     end if:
 
@@ -347,7 +355,6 @@ SingleExperimentIdentifiableFunctions := proc(model, {infolevel := 0})
 
     states, inputs, outputs, params, model_eq := op(ParseInput(model)):
     ios := [op(inputs), op(outputs)]:
-
     # Step 1
     if infolevel > 0 then
         printf("Step 1: Computing input-output equations\n"):
@@ -357,7 +364,6 @@ SingleExperimentIdentifiableFunctions := proc(model, {infolevel := 0})
     if infolevel > 0 then
         printf("Total number of io-equations: %a\n", nops(io_eqs)):
     end if:
- 
     si_gens := {}:
     for eq in io_eqs do
         # Step 2

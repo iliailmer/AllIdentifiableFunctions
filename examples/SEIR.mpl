@@ -5,7 +5,8 @@
 # Equation (2.2) with cumulative incidence observations
 read "../ComputeIdentifiableFunctionsRG.mpl";
 
-# Prevalence observations
+# Prevalence observationskernelopts(printbytes=false, assertlevel=1):
+interface(echo=0, prettyprint=0):
 model := [
   diff(S(t), t) = b * S(t) * In(t) / N,
   diff(E(t), t) = b * S(t) * In(t) / N - nu * E(t),
@@ -18,7 +19,8 @@ me := MultiExperimentIdentifiableFunctions(model, simplified_generators=true):
 printf("The bound for the number of experiments is %a, this means that the fields of single-experiment and multi-experiment identifiable functions coincide, and they are equal to: %a\n", me[1], me[3]):
 
 # Cummulative incidence observations
-# using change of variables Ninv := 1 / N to simplify the computation
+# using change of variables Ninv := 1 / N to simplify the computationkernelopts(printbytes=false, assertlevel=1):
+interface(echo=0, prettyprint=0):
 model := [
   diff(S(t), t) = b * S(t) * In(t) * Ninv,
   diff(E(t), t) = b * S(t) * In(t) * Ninv - nu * E(t),

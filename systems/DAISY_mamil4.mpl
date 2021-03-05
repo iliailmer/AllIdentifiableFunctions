@@ -1,11 +1,12 @@
-read "../IdentifiabilityODE.mpl";
-
-sigma := [
+read "../ComputeIdentifiableFunctionsRG.mpl"; #"../IdentifiabilityODE.mpl";
+kernelopts(printbytes=false, assertlevel=1):
+interface(echo=0, prettyprint=0):
+model :=[
   diff(x1(t), t) = -k01 * x1(t) + k12 * x2(t) + k13 * x3(t) + k14 * x4(t) - k21 * x1(t) - k31 * x1(t) - k41 * x1(t) + u(t),
   diff(x2(t), t) = -k12 * x2(t) + k21 * x1(t),
   diff(x3(t), t) = -k13 * x3(t) + k31 * x1(t),
   diff(x4(t), t) = -k14 * x4(t) + k41 * x1(t),
   y(t) = x1(t)
-];
+]:
 
-IdentifiabilityODE(sigma, GetParameters(sigma)):
+me:= MultiExperimentIdentifiableFunctions(model, simplified_generators=true, no_bound=true): print(me[3]);#IdentifiabilityODE(sigma, GetParameters(sigma)):

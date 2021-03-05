@@ -1,7 +1,8 @@
 # Example from Section 5.1 of the paper
 
 read "../ComputeIdentifiableFunctions.mpl";
-
+kernelopts(printbytes=false, assertlevel=1):
+interface(echo=0, prettyprint=0):
 model := [
     diff(x1(t), t) = (a * x1(t) - b * x1(t) * x2(t)),
     diff(x2(t), t) = (-c * x2(t) + d * x1(t) * x2(t) + e * u(t)),

@@ -1,7 +1,7 @@
 # Example 6.3 from the paper "Global Identifiability of Differential Models", taken from
 # Balsa-Canto, E., Alonso, A. A., Banga, J. R., 
 # An iterative identification procedure for dynamic modeling of biochemical networks
-read "../IdentifiabilityODE.mpl";
+read "../ComputeIdentifiableFunctions.mpl"; #"../IdentifiabilityODE.mpl";
 
 # Data from Table 1 in 
 # An iterative identification procedure for dynamic modeling of biochemical networks
@@ -22,9 +22,10 @@ known_data := [
   c_1c = 5 / 10^(7),
   c_2c = 0,
   c_3c = 4 / 10^(4)
-];
-
-sigma := subs(known_data, [
+]:
+kernelopts(printbytes=false, assertlevel=1):
+interface(echo=0, prettyprint=0):
+model :=subs(known_data, [
   diff(x1(t), t) = k_prod - k_deg * x1(t) - k1 * x1(t) * u(t),
   diff(x2(t), t) = -k3 * x2(t) - k_deg * x2(t) - a2 * x2(t) * x10(t) + t1 * x4(t) - a3 * x2(t) * x13(t) + t2 * x5(t) + (k1 * x1(t) - k2 * x2(t) * x8(t)) * u(t),
   diff(x3(t), t) = k3 * x2(t) - k_deg * x3(t) + k2 * x2(t) * x8(t) * u(t),
@@ -48,4 +49,4 @@ sigma := subs(known_data, [
   y5(t) = x7(t)
 ]);
 
-IdentifiabilityODE(sigma, GetParameters(sigma)):
+me:= MultiExperimentIdentifiableFunctions(model, simplified_generators=true, no_bound=true): print(me[3]);#IdentifiabilityODE(sigma, GetParameters(sigma)):

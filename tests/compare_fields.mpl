@@ -10,7 +10,7 @@ cases := [
     [
         [[a + b^2 - c^2, b * c, b / c], [a, b^2, c^2, b / c]], true
     ]
-];
+]:
 
 num_passed := 0:
 num_failed := 0:
