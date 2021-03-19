@@ -1,45 +1,54 @@
-kernelopts(printbytes=false, assertlevel=1):
-interface(echo=0, prettyprint=0):
+
 pth:= "/Users/iliailmer/Documents/CUNY/Research/AlgebraicGeom/AllIdentifiableFunctions/TDDS/TDDS.lib":
 libname := pth, libname;
 
-with(TDDS);
-with(DifferentialThomas);
-infolevel[TDDS] := 2;
-infolevel[DifferentialThomas]:=2;
+# with(TDDS);
+# with(DifferentialThomas);
+# infolevel[TDDS] := 2;
+# infolevel[DifferentialThomas]:=2;
+read "ComputeIdentifiableFunctions.mpl";
 
-
-# model :=[
-#   diff(x(t), t) = lm - d * x(t) - beta * x(t) * v(t),
-#   diff(y(t), t) = beta * x(t) * v(t) - a * y(t),
-#   diff(v(t), t) = k * y(t) - u * v(t),
-#   diff(w(t), t) = c * z(t) * y(t) * w(t) - c * q * y(t) * w(t) - b * w(t),
-#   diff(z(t), t) = c * q * y(t) * w(t) - h * z(t),
-#   y1(t) = w(t),
-#   y2(t) = z(t)
-# ]:
 kernelopts(printbytes=false, assertlevel=1):
 interface(echo=0, prettyprint=0):
 model :=[
-  diff(xA(t), t) = -k1 * xA(t),
-  diff(xB(t), t) = k1 * xA(t) - k2 * xB(t),
-  diff(xC(t), t) = k2 * xB(t),
-  diff(eA(t), t) = 0,
-  diff(eC(t), t) = 0,
-  y1(t) = xC(t),
-  y2(t) = eA(t) * xA(t) + eB * xB(t) + eC(t) * xC(t),
-  y3(t) = eA(t),
-  y4(t) = eC(t)
+  diff(x1(t), t) = -(k3 + k7) * x1(t) + k4 * x2(t),
+  diff(x2(t), t) = k3 * x1(t) - (k4 + a(t) * k5 + b(t) * d(t) * k5) * x2(t) + k6 * x3(t) + k6 * x4(t) + k5 * x2(t) * x3(t) + k5 * x2(t) * x4(t),
+  diff(x3(t), t) = a(t) * k5 * x2(t) - k6 * x3(t) - k5 * x2(t) * x3(t),
+  diff(x4(t), t) = b(t) * d(t) * k5 * x2(t) - k6 * x4(t) - k5 * x2(t) * x4(t),
+  diff(x5(t), t) = k7 * x1(t),
+  diff(a(t), t) = 0,
+  diff(b(t), t) = 0,
+  diff(d(t), t) = 0,
+  y1(t) = x5(t),
+  y2(t) = a(t),
+  y3(t) = b(t),
+  y4(t) = d(t)
 ]:
+states, inputs, outputs, params, model_eqs := op(ParseInput(model)):
+model_denomfree := ExtractDenominator(model_eqs):
 
-ComputeRanking([t], [[eA, eC, xA, xB, xC], [y1, y2, y3, y4]]);
-tdds_out := DifferentialThomasDecomposition(map(x->lhs(x) - rhs(x), sigma), [], "stop"=1): # TDDS not using equations
+io_eqs := GetIOEquations(model_denomfree, states, inputs, outputs, params, 1):
+print(io_eqs);
+if nops(inputs)>0 then
+    state_outs_inputs := [[op(states)], [op(outputs)], [op(inputs)]]:
+else
+    state_outs_inputs := [[op(states)], [op(outputs)]]:
+end if:
 
-Ranking([t], [[eA, eC, xA, xB, xC], [y1, y2, y3, y4]]);
-dt_out := ThomasDecomposition(sigma, [], "stop"=1); # Equations():
+io_jets:= map(DifferentialThomas:-Tools:-ToJet, io_eqs):
+DifferentialThomas:-Ranking([t], state_outs_inputs):
+leaders := map(DifferentialThomas:-Leader, io_jets);
+degrees := seq(degree(io_jets[i], leaders[i]), i=1..nops(io_jets));
 
-# Rosenfeld Groebner Code
 
-Rorig := DifferentialAlgebra:-DifferentialRing(blocks = [ [y1, y2, y3, y4], [eA, eC, xA, xB, xC]], derivations = [t], arbitrary = [eb, k1, k2]):
-chset_orig := DifferentialAlgebra:-RosenfeldGroebner(map(x->lhs(x)-rhs(x), sigma), Rorig, singsol=none)[1]:
+read "ComputeIdentifiableFunctionsRG.mpl";
+
+io_eqs := GetIOEquations(model_denomfree, states, inputs, outputs, params, 1):
+
+
+io_jets:=map(x->DifferentialAlgebra:-Tools:-ToJet(x, states), io_eqs):
+Rorig := DifferentialRing(blocks = [[op(outputs)], [op(states)], [op(inputs)]], derivations = [t], arbitrary = params):
+leaders := map(x->DifferentialAlgebra:-Tools:-LeadingDerivative(x, Rorig), io_jets);
+degrees := seq(degree(io_jets[i], leaders[i]), i=1..nops(io_jets));
+
 

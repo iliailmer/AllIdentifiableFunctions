@@ -19,3 +19,4 @@ model :=[
 
 me:= MultiExperimentIdentifiableFunctions(model, simplified_generators=true, no_bound=true):
 print(me[3]);#IdentifiabilityODE(sigma, GetParameters(sigma)):
+

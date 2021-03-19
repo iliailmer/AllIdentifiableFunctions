@@ -7,8 +7,7 @@ model :=[
   diff(x3(t), t) = p6 * x1(t) - p7 * x3(t),
   diff(u0(t), t) = 1,
   y(t) = x1(t),
-  y2(t) = u0(t)
- 
+  y2(t) = u0(t) 
 ]:
 
 me:= MultiExperimentIdentifiableFunctions(model, simplified_generators=true, no_bound=true): 

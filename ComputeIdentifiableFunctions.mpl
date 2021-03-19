@@ -1,9 +1,14 @@
 ###############################################################################
 # Part 1: Algorithms for computation with subfields of rational functions
 ###############################################################################
-
+# local `+`;
+# `+`:=proc(a, b)
+# return (:-`+`(a, b))mod nextprime(2^20)
+# end proc;
+infolevel[DifferentialThomas]:=2:
 with(PolynomialIdeals):
-
+# G:=GF(nextprime(2^29-3), 1):
+# use G in 
 #------------------------------------------------------------------------------
 
 IdealsEq := proc(A, B)
@@ -205,8 +210,11 @@ GetIOEquations := proc(model, states, inputs, outputs, params, infolevel)
     # Computes a list of input-output equations of the model
     local Relim, Rorig, charsets, chset_orig, general_comps, general, c, e, gen_comp, io_eqs:
     is_deriv := x-> StringTools[Has](convert(x, string), "diff");
+    state2fun := x -> parse(cat(convert(x, string), "(t)")):
+    
+    
     if infolevel > 0 then
-        printf("    Computing the characteristic set (singsol = none)\n"):
+        printf("    Computing the characteristic set (\"stop\" = 1)\n"):
     end if:
     # charsets := RosenfeldGroebner(model, Relim, singsol = none):
     # this check is required for ranking: if inputs is empty, exclude from input
@@ -221,8 +229,14 @@ GetIOEquations := proc(model, states, inputs, outputs, params, infolevel)
 
     gen_comp := charsets[1]:
     io_eqs := DifferentialThomas:-Equations(gen_comp): #, DifferentialThomas:-Tools:-Leader < parse(cat(states[-1], "(t)"))):
-    io_eqs := select(x->is_deriv(lhs(x)), io_eqs):
-    return map(x->expand(simplify(denom(rhs(x))*lhs(x)-denom(rhs(x))*rhs(x))), io_eqs):
+    state_funcs := {op(map(y -> parse(cat(convert(y, string), "(t)")), states))};
+    filter_out := select(x->nops((indets(lhs(x)) minus {t}) intersect state_funcs)>0, io_eqs);
+    io_eqs := select(x->not x in filter_out, io_eqs);
+    print(filter_out):
+    io_eqs := map(x->expand(simplify(denom(rhs(x))*lhs(x)-denom(rhs(x))*rhs(x))), io_eqs):
+    #io_eqs := select(x->nops({op(map(state2fun, states))} intersect  (indets(x) minus {t}))=0, io_eqs);
+    return io_eqs;
+
 end proc:
 
 #------------------------------------------------------------------------------
@@ -232,7 +246,7 @@ end proc:
 # by Kitonum 15364
 coefff:=proc(P, t)
     local L, H, i, k:
-    L:=[coeffs(P, indets(P), 'h')]: H:=[h]: k:=0:
+    L:=[coeffs(P, indets(P), 'hh')]: H:=[hh]: k:=0:
     for i from 1 to nops(H) do
         if H[i]=t then k:=L[i] fi:
     end do:
@@ -259,6 +273,7 @@ DecomposePolynomial := proc(p, vars_main, vars_coef, infolevel)
         m := monoms[i]:
         for j from 1 to nops(result_cf) do
             lc, lm := Groebner[LeadingTerm](result_cf[j], plex(op(vars_coef))):
+            print(c, lm):
             coeff_in_c := coefff(c, lm):
             c := c - coeff_in_c / lc * result_cf[j]:
             result_monom[j] := result_monom[j] + coeff_in_c / lc * m:
@@ -394,19 +409,19 @@ FunctionToVariable := proc(f):
 end proc:
 
 ParseInput := proc(model)
-   local all_symbols, x_functions, io_functions, params, states, ios, diff_polys, lhss, out_functions, in_functions, inputs, outputs:
-   diff_polys := map(eq -> lhs(eq) - rhs(eq), model):
-   all_symbols := foldl(`union`, op( map(e -> indets(e), diff_polys) )) minus {t}:
-   x_functions := map(f -> int(f, t), select( f -> type(int(f, t), function(name)), all_symbols )):
-   io_functions := select( f -> not type(int(f, t), function(name)) and type(f, function(name)) and not f in x_functions, all_symbols ):
-   lhss := map(eq -> lhs(eq), model):
-   out_functions := select(f -> f in lhss, io_functions):
-   in_functions := select(f -> not (f in lhss), io_functions):
-   params := [op(select(f -> not type(f, function(name)) and not type(int(f, t), function(name)), all_symbols))]:
-   states := [op(map(FunctionToVariable, x_functions))]:
-   inputs := [op(map(FunctionToVariable, in_functions))]:
-   outputs := [op(map(FunctionToVariable, out_functions))]:
-   return [states, inputs, outputs, params, diff_polys]:
+local all_symbols, x_functions, io_functions, params, states, ios, diff_polys, lhss, out_functions, in_functions, inputs, outputs:
+diff_polys := map(eq -> lhs(eq) - rhs(eq), model):
+all_symbols := foldl(`union`, op( map(e -> indets(e), diff_polys) )) minus {t}:
+x_functions := map(f -> int(f, t), select( f -> type(int(f, t), function(name)), all_symbols )):
+io_functions := select( f -> not type(int(f, t), function(name)) and type(f, function(name)) and not f in x_functions, all_symbols ):
+lhss := map(eq -> lhs(eq), model):
+out_functions := select(f -> f in lhss, io_functions):
+in_functions := select(f -> not (f in lhss), io_functions):
+params := [op(select(f -> not type(f, function(name)) and not type(int(f, t), function(name)), all_symbols))]:
+states := [op(map(FunctionToVariable, x_functions))]:
+inputs := [op(map(FunctionToVariable, in_functions))]:
+outputs := [op(map(FunctionToVariable, out_functions))]:
+return [states, inputs, outputs, params, diff_polys]:
 end proc:
 
 #------------------------------------------------------------------------------
@@ -436,7 +451,7 @@ MultiExperimentIdentifiableFunctions := proc(model, {infolevel := 0, simplified_
     if infolevel > 0 then
         printf("Total number of io-equations: %a\n", nops(io_eqs)):
     end if:
- 
+
     io_coeffs := []:
     bound := 0:
     for eq in io_eqs do
@@ -458,10 +473,10 @@ MultiExperimentIdentifiableFunctions := proc(model, {infolevel := 0, simplified_
 
     generators := {}:
     for io_coef in io_coeffs do
-         io_coef := sort(io_coef, (a, b) -> length(convert(a, string)) < length(convert(b, string)));
-         for i from 2 to nops(io_coef) do
-             generators := {op(generators), io_coef[i] / io_coef[1]}:
-         end do:
+        io_coef := sort(io_coef, (a, b) -> length(convert(a, string)) < length(convert(b, string)));
+        for i from 2 to nops(io_coef) do
+            generators := {op(generators), io_coef[i] / io_coef[1]}:
+        end do:
     end do:
 
     result := [bound, generators]:
@@ -498,11 +513,11 @@ GetPSSolution := proc(model, ord)
             x_sols[i] := (lhs(x_sols[i]) = (rhs(x_sols[i]) + t^cur_ord * coeff(rhs_eval, t, cur_ord - 1) / cur_ord)):
         end do:
     end do:
-  
+
     total_sub := [op(x_sols), op(params_subs), op(input_subs)]:
     y_funcs := map(y -> parse(cat(y, "(t)")), outputs):
     y_sols := map(y -> y = subs(total_sub, subs(model_sub, y)), y_funcs):
-  
+
     return [op(y_sols), op(input_subs), op(params_subs), op(x_sols)]:
 end proc:
 

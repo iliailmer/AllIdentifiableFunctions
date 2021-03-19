@@ -3,9 +3,7 @@
 # Review: To be or not to be an identifiable model. Is this a relevant question in animal science modelling?
 # doi.org/10.1017/S1751731117002774
 # System (3) in Supplementary Material 2, initail conditions are assumed to be unknown
-kernelopts(printbytes=false, assertlevel=1):
-interface(echo=0, prettyprint=0):
-read "../ComputeIdentifiableFunctions.mpl"; #"../IdentifiabilityODE.mpl":
+read "../ComputeIdentifiableFunctionsRG.mpl"; #"../IdentifiabilityODE.mpl":
 kernelopts(printbytes=false, assertlevel=1):
 interface(echo=0, prettyprint=0):
 model :=[

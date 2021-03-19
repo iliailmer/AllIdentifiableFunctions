@@ -2,7 +2,7 @@
 # Wodarz, D., Nowak, M.
 # Mathematical models of HIV pathogenesis and treatment  
 # System (6)
-read "../ComputeIdentifiableFunctionsRG.mpl"; #"../IdentifiabilityODE.mpl":
+read "../ComputeIdentifiableFunctions.mpl"; #"../IdentifiabilityODE.mpl":
 kernelopts(printbytes=false, assertlevel=1):
 interface(echo=0, prettyprint=0):
 model :=[
@@ -15,4 +15,5 @@ model :=[
   y2(t) = z(t)
 ]:
 
-me:= MultiExperimentIdentifiableFunctions(model, simplified_generators=true, no_bound=true): print(me[3]);#IdentifiabilityODE(sigma, GetParameters(sigma)):
+me:= MultiExperimentIdentifiableFunctions(model, simplified_generators=true, no_bound=true, infolevel=1): 
+print(me[3]);#IdentifiabilityODE(sigma, GetParameters(sigma)):
